@@ -1,0 +1,86 @@
+# python visualisation/make_table.py visualisation/configs/table_core.yaml -o visualisation/plots/table_core.tex
+# Table 1 of the paper: main comparison. Metrics: <table>/<column> of EVAL_METRICS/<run>/<selection>/<table>.csv.
+label: tab:main
+selection: val_keyframes_draws3
+units: newrow  # none | displayed | newrow | TODO: small
+stds: false  # summary stds are over frames, voxelnext stds over draws
+style:
+  best: underline
+  gradient: ['#808080', '#000000']  # worst -> best ranked value of each column
+
+columns:
+  #- group: Count
+  #  columns:
+  #    - {label: '$\widetilde{N}$-MAE', metric: summary/count_abs_error_mean, std: summary/count_abs_error_std, format: .1f, best: min}
+  - group: Position
+    columns:
+      - {label: 'CD${}^\dagger$', unit: m, metric: summary/chamfer_distance_xy_mean, std: summary/chamfer_distance_xy_std, format: .3f, best: min}
+      - {label: 'MMD${}^\dagger$', metric: summary/pcl_mmd_xy_mean, std: summary/pcl_mmd_xy_std, format: .4f, best: min}
+      # F1 of the 1 m coverage precision/recall; RadarGen's IoU = F1 / (2 - F1) per frame
+      #- {label: 'F1${}^\dagger$', metric: summary/iou_th1_f1_mean, std: summary/iou_th1_f1_std, format: .3f, best: max}
+  - group: RCS
+    columns:
+      - {label: MAE, unit: dBsm, metric: summary/rcs_mae_dense_mean, std: summary/rcs_mae_dense_std, format: .2f, best: min}
+  #    - {label: 'MAE${}_{N\!N}$', unit: dBsm, metric: summary/rcs_mae_nn_mean, std: summary/rcs_mae_nn_std, format: .2f, best: min}
+      - {label: 'MMD${}^\dagger$', metric: summary/pcl_mmd_rcs_mean, std: summary/pcl_mmd_rcs_std, format: .3f, best: min}
+  - group: Doppler
+    columns:
+      - {label: MAE, unit: m/s, metric: summary/doppler_mae_dense_mean, std: summary/doppler_mae_dense_std, format: .2f, best: min}
+  #    - {label: 'MAE${}_{N\!N}$', unit: m/s, metric: summary/doppler_mae_nn_mean, std: summary/doppler_mae_nn_std, format: .2f, best: min}
+      - {label: 'MMD${}^\dagger$', metric: summary/pcl_mmd_doppler_mean, std: summary/pcl_mmd_doppler_std, format: .3f, best: min}
+  #- group: Joint
+  #  columns:
+  #    - {label: 'Precision${}^\dagger$', metric: summary/distance_attr_precision_mean, std: summary/distance_attr_precision_std, format: .3f, best: max}
+  #    - {label: 'Recall${}^\dagger$', metric: summary/distance_attr_recall_mean, std: summary/distance_attr_recall_std, format: .3f, best: max}
+  #    - {label: 'F1${}^\dagger$', metric: summary/distance_attr_f1_mean, std: summary/distance_attr_f1_std, format: .3f, best: max}
+  - group: Detection
+    columns:
+      - {label: 'Hit rate${}^\dagger$', unit: '\%', metric: summary/box_hit_rate, scale: 100, format: .2f, best: max}
+      - {label: 'mAP${}^\dagger$', metric: voxelnext/mAP, std: 'voxelnext/mAP:std', format: .4f, best: max}
+      - {label: 'NDS${}^\dagger$', metric: voxelnext/NDS, std: 'voxelnext/NDS:std', format: .4f, best: max}
+  - group: Cost
+    columns:
+      - {label: Params, unit: M, metric: cost/params, format: .1f, best: min}
+      # GH200 GPU hours from job start to the saved checkpoint of every training stage (.cache/training_gpuh.py)
+      - {label: Training, unit: GPUh, metric: cost/train_gpu_hours, format: .0f, best: min, rank: false}
+      # batch size 1, prediction + point cloud, mean over the last 100 of 110 frames (scripts/timing.py)
+      - {label: Inference, unit: s, metric: 'timing/seconds?position>=10', std: 'timing/seconds?position>=10:std',
+         selection: val_keyframes_n110_sel42, format: .3f, best: min}
+
+rows:
+  - group: RadarGen
+    rows:
+      - label: 'RadarGen \cite{borreda2026radargen}'
+        rank: false
+        values:  # published values
+          summary/chamfer_distance_xy_mean: 1.68*
+          summary/pcl_mmd_xy_mean: 0.056*
+          summary/iou_th1_mean: 0.31*
+          summary/iou_th1_f1_mean: 0.47**  # published IoU 0.31 as F1 = 2 IoU / (1 + IoU)
+          summary/pcl_mmd_rcs_mean: 0.09*
+          summary/pcl_mmd_doppler_mean: 0.31*
+          summary/chamfer_distance_all_norm_mean: 0.04*
+          summary/distance_attr_precision_mean: 0.26*
+          summary/distance_attr_recall_mean: 0.23*
+          summary/distance_attr_f1_mean: 0.24*
+          summary/box_hit_rate: 66*
+          voxelnext/mAP: 0.11*
+          voxelnext/NDS: 0.30*
+          cost/params: 592*
+          cost/train_gpu_hours: 384* (L40)  # 8 L40 x 48 h
+          timing/seconds?position>=10: 1.5*
+      - {label: '\quad reproduced', run: radargen, values: {cost/params: 829.7}}
+      - {label: '\quad C3P-dar loss', run: dit/epoch_44_step_58057, values: {cost/params: 840.0, cost/train_gpu_hours: 379 (GH200)}}
+  - group: C3P-dar
+    rows:
+      #- {label: C3P-dar-Dv3, run: dino/epoch_91_step_19914, values: {cost/params: 239.9, cost/train_gpu_hours: 425 (GH200)}}
+      - {label: C3P-dar-Dv3, run: dino_neck_compact/epoch_94_step_20595, values: {cost/params: 80.6, cost/train_gpu_hours: 378 (GH200)}}
+      - {label: C3P-dar-RN50, run: resnet50/epoch_95_step_25030, values: {cost/params: 239.0, cost/train_gpu_hours: 378 (GH200)}}
+  - group: reference
+    rows:
+      - {label: GT Radar, run: real_radar, selection: val_keyframes_draws1, rank: false,
+         values: {summary/box_hit_rate: 100}}
+
+caption: |
+  Core point cloud metrics (Position, RCS, Doppler) as well as annotated Object Detection and Cost metrics for all model variants. 
+  Values are shaded from worst (light gray) to best (black and underlined), * means reported in \cite{borreda2026radargen}, and ${}^\dagger$ was proposed by \cite{borreda2026radargen}.

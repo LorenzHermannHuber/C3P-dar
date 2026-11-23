@@ -1,0 +1,82 @@
+# python visualisation/make_table.py visualisation/configs/appendix/table_radargen_foreground.yaml -o visualisation/plots/appendix/table_radargen_foreground.tex
+# RadarGen Table 1 (bottom, Foreground) with our models. Box stds are over all boxes x draws; the hit rate std is
+# over draws (summary/box_hit_rate_std, only in summaries written after it was added); class MMDs pool all boxes.
+label: tab:radargen_foreground
+selection: val_keyframes_draws3
+units: none
+stds: true
+style:
+  best: underline
+  gradient: ['#808080', '#000000']
+
+columns:
+  - group: Foreground
+    columns:
+      - {label: CD Loc., metric: summary/box_chamfer_distance_xy_mean, std: summary/box_chamfer_distance_xy_std, format: .2f, best: min}
+      - {label: CD Full, metric: summary/box_chamfer_distance_all_norm_mean, std: summary/box_chamfer_distance_all_norm_std, format: .3f, best: min}
+      - {label: Density Sim., metric: summary/box_num_points_similarity_mean, std: summary/box_num_points_similarity_std, format: .2f, best: max}
+      - {label: Hit Rate, metric: summary/box_hit_rate, std: summary/box_hit_rate_std, format: .2f, best: max}
+  - group: MMD Car
+    columns:
+      - {label: Loc., metric: summary/invariant_mmd_xy_car, format: .3f, best: min}
+      - {label: RCS, metric: summary/invariant_mmd_rcs_car, format: .3f, best: min}
+      - {label: Doppler, metric: summary/invariant_mmd_doppler_car, format: .3f, best: min}
+  - group: MMD Truck
+    columns:
+      - {label: Loc., metric: summary/invariant_mmd_xy_truck, format: .3f, best: min}
+      - {label: RCS, metric: summary/invariant_mmd_rcs_truck, format: .3f, best: min}
+      - {label: Doppler, metric: summary/invariant_mmd_doppler_truck, format: .3f, best: min}
+  - group: MMD Trailer
+    columns:
+      - {label: Loc., metric: summary/invariant_mmd_xy_trailer, format: .4f, best: min}
+      - {label: RCS, metric: summary/invariant_mmd_rcs_trailer, format: .3f, best: min}
+      - {label: Doppler, metric: summary/invariant_mmd_doppler_trailer, format: .3f, best: min}
+
+rows:
+  - group: published
+    rows:
+      - label: 'Baseline (RGB2Point) \cite{borreda2026radargen}'
+        rank: false
+        values:
+          summary/box_chamfer_distance_xy_mean: '1.32 $\pm$ 0.79*'
+          summary/box_chamfer_distance_all_norm_mean: '0.075 $\pm$ 0.049*'
+          summary/box_num_points_similarity_mean: '0.35 $\pm$ 0.43*'
+          summary/box_hit_rate: 0.37*
+          summary/invariant_mmd_xy_car: 0.035*
+          summary/invariant_mmd_rcs_car: 0.753*
+          summary/invariant_mmd_doppler_car: 0.549*
+          summary/invariant_mmd_xy_truck: 0.167*
+          summary/invariant_mmd_rcs_truck: 0.202*
+          summary/invariant_mmd_doppler_truck: 0.485*
+          summary/invariant_mmd_xy_trailer: 0.0459*
+          summary/invariant_mmd_rcs_trailer: 0.064*
+          summary/invariant_mmd_doppler_trailer: 0.607*
+      - label: 'RadarGen \cite{borreda2026radargen}'
+        rank: false
+        values:
+          summary/box_chamfer_distance_xy_mean: '0.95 $\pm$ 0.65*'
+          summary/box_chamfer_distance_all_norm_mean: '0.069 $\pm$ 0.049*'
+          summary/box_num_points_similarity_mean: '0.51 $\pm$ 0.41*'
+          summary/box_hit_rate: 0.66*
+          summary/invariant_mmd_xy_car: 0.037*
+          summary/invariant_mmd_rcs_car: 0.006*
+          summary/invariant_mmd_doppler_car: 0.014*
+          summary/invariant_mmd_xy_truck: 0.024*
+          summary/invariant_mmd_rcs_truck: 0.031*
+          summary/invariant_mmd_doppler_truck: 0.060*
+          summary/invariant_mmd_xy_trailer: 0.0069*
+          summary/invariant_mmd_rcs_trailer: 0.022*
+          summary/invariant_mmd_doppler_trailer: 0.046*
+  - group: RadarGen
+    rows:
+      - {label: 'RadarGen (reproduced)', run: radargen}
+      - {label: 'C3P-dar loss', run: dit/epoch_44_step_58057}
+  - group: C3P-dar
+    rows:
+      - {label: C3P-dar-Dv3, run: dino_neck_compact/epoch_94_step_20595}
+      - {label: C3P-dar-RN50, run: resnet50/epoch_95_step_25030}
+
+caption: |
+  Foreground metrics of \cite{borreda2026radargen} (Tab.~1, bottom) for all models, over the points in annotated boxes:
+  mean $\pm$ s.d. over all boxes and draws (hit rate: over draws). The class MMDs compare the box-local points of all boxes of a class.
+  * means reported in \cite{borreda2026radargen}.

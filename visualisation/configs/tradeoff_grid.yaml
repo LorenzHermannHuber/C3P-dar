@@ -1,0 +1,46 @@
+# python visualisation/plot_tradeoff.py visualisation/configs/tradeoff_grid.yaml
+# Fig. 4 candidate: position and joint Pareto fronts stacked (left, 60 %), hit rate and RCS-MMD over the budget (right).
+budget_label: 'budget b: points per frame'
+selection: val_keyframes_draws3
+table: budgets_v2
+output: visualisation/plots/tradeoff
+name: tradeoff_grid
+title: 'Effect of over/undersampling points on metrics'
+grayscale: false
+coverage: 0.95
+interval: null
+labelled_budgets: [100, 500, 1000, 1500, 2000]
+label_clearance: 3
+iso_f1: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+f1_axis: true
+legend_rows: 4
+markers:
+  native: {marker: o, size: 7, label: 'own count'}
+  exact: {marker: '*', size: 11, label: 'b = GT count'}
+width: 6
+height: 5
+grid: {rows: 2, cols: 2, widths: [7, 3], heights: [1, 1]}
+aspect: auto
+ticks: null
+
+panels:
+  - {name: position, row: 0, col: 0, x: position_recall, y: position_precision, xlim: [0, null], ylim: [null, null],
+     ticks: {major: 0.1, minor: 0.05}, iso_f1: [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6],
+     xlabel: 'DA-Recall ↑', ylabel: 'DA-Precision ↑', f1_label: 'DA-F1 ↑',
+     title: 'Position precision-recall trade-off'}
+  - {name: joint, row: 1, col: 0, x: distance_attr_recall, y: distance_attr_precision, xlim: [0, null], ylim: [null, null],
+     ticks: {major: 0.1, minor: 0.05}, iso_f1: [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45],
+     xlabel: 'DA-Recall${}^\dagger$ ↑', ylabel: 'DA-Precision${}^\dagger$ ↑', f1_label: 'DA-F1${}^\dagger$ ↑',
+     title: 'Joint precision-recall trade-off'}
+  - {name: hit_rate, row: 0, col: 1, x: count, y: box_hit_rate, iso_f1: [], f1_axis: false, xlim: [0, 2100],
+     ticks: {x: {major: 750, minor: 250}, y: {major: 0.2, minor: 0.0666666}}, labelled_budgets: [], xlabel: 'Points per frame', ylabel: '', #'Hit rate ↑',
+     title: 'Hit rate ↑'}
+  - {name: rcs_mmd, row: 1, col: 1, x: count, y: pcl_mmd_rcs, iso_f1: [], f1_axis: false, xlim: [0, 2100],
+     ticks: {x: {major: 750, minor: 250}, y: {major: 0.1, minor: 0.025}}, labelled_budgets: [], xlabel: 'Points per frame', ylabel: '', #'RCS-MMD ↓',
+     title: 'RCS-MMD ↓'}
+
+runs:
+  - {label: RadarGen, run: radargen, color: '#AA1B2F'}
+  - {label: C3P-dar loss, run: dit/epoch_44_step_58057, color: '#D55E00'}
+  - {label: C3P-dar-Dv3, run: dino_neck_compact/epoch_94_step_20595, color: '#1D6AA4'}
+  - {label: C3P-dar-RN50, run: resnet50/epoch_95_step_25030, color: '#009E73'}

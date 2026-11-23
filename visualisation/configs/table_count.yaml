@@ -1,0 +1,42 @@
+# python visualisation/make_table.py visualisation/configs/table_count.yaml -o visualisation/plots/table_count.tex
+# Count-fidelity comparison against the observed mean count.
+label: tab:count_fidelity
+environment: table  # null: only the tabular, to \input in the tradeoff figure; table: single column; table*: both
+selection: val_keyframes_draws3
+units: none
+stds: false
+style:
+  best: underline
+  gradient: ['#808080', '#000000']
+
+columns:
+  - group: Predicted count
+    columns:
+      - {label: 'mean $\widetilde{N}$', metric: summary/generated_count_mean, std: summary/generated_count_std, format: .1f, best: closest, target: 1123.8}
+      - {label: 'mean $\widehat{N}$', metric: summary/ppp_expected_total_count_mean, std: summary/ppp_expected_total_count_std, format: .1f, best: closest, target: 1123.8}
+  - group: Count error
+    columns:
+      - {label: '$\widetilde{N}$-MAE', metric: summary/count_abs_error_mean, std: summary/count_abs_error_std, format: .1f, best: min}
+      - {label: '$\widehat{N}$-MAE', metric: summary/ppp_total_count_abs_error_mean, std: summary/ppp_total_count_abs_error_std, format: .1f, best: min}
+
+rows:
+  - group: RadarGen
+    rows:
+      - label: 'RadarGen \cite{borreda2026radargen}'
+        rank: false
+        values:
+          summary/generated_count_mean: '--'
+          summary/ppp_expected_total_count_mean: '--'
+          summary/count_abs_error_mean: '--'
+          summary/ppp_total_count_abs_error_mean: '--'
+      - {label: '\quad reproduced', run: radargen,
+         values: {summary/ppp_expected_total_count_mean: '--', summary/ppp_total_count_abs_error_mean: '--'}}
+      - {label: '\quad C3P-dar loss', run: dit/epoch_44_step_58057}
+  - group: C3P-dar
+    rows:
+      - {label: C3P-dar-Dv3, run: dino_neck_compact/epoch_94_step_20595}
+      - {label: C3P-dar-RN50, run: resnet50/epoch_95_step_25030}
+
+caption: |
+  Count-fidelity evaluation. Mean counts are ranked by their absolute deviation from the ground truth mean count of $1123.8$.
+  Shading progresses from worst (light gray) to best (black and underlined).

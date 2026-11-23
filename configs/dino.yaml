@@ -1,0 +1,49 @@
+# Run 2773475 (final DINO, 16 GPUs; continuation chain 2658284 -> 2684031 -> 2773475 with cosine decay to 1e-5 at the end);
+# evaluated: outputs/dino/checkpoints/epoch_91_step_19914.ckpt
+data:
+  root: /e/scratch/nxtaim-1/public/truckscenes/RadarGen_preprocessed
+  num_workers: 8
+
+model:
+  type: dino
+  model_name: vit_small_patch16_dinov3
+  frozen_base: false
+  lora_r: 16
+  lora_alpha: 32.0
+  neck_layers: 12
+  neck_heads: 9
+  head:
+    channels: [128, 64, 32]
+    blocks: 2
+    heads: 4
+    window_size: 8
+    output_scale: 2
+    projection_kernel_size: 3
+    shifted_windows: true
+  grad_checkpointing: true
+  pretrained:
+    checkpoint_path: checkpoints/vit_small_patch16_dinov3.lvd1689m/model.safetensors
+
+loss:
+  normalize_by_gt_count: true
+  mark_link: cubic
+  weights: {ppp: 1.0, rcs: 1.0, doppler: 1.0}
+
+optim:
+  type: AdamW
+  lr: 1.0e-4
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+
+train:
+  seed: 42
+  batch_size: 24  # per GPU
+  warmup_steps: 100
+  gradient_clip: 1.0
+  precision: bf16-mixed
+  max_steps: 19914
+  log_every_n_steps: 20
+  checkpoint_every_n_steps: 1000
+  val_every_n_steps: 2000
+  limit_val_batches: 50

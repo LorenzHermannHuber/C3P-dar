@@ -1,0 +1,58 @@
+# python visualisation/make_table.py visualisation/configs/appendix/table_radargen_detection.yaml -o visualisation/plots/appendix/table_radargen_detection.tex
+# RadarGen supplementary Table 1 (VoxelNeXt detection) with our models. Stds are over draws.
+label: tab:radargen_detection
+environment: table*
+selection: val_keyframes_draws3
+units: none
+stds: true
+style:
+  best: underline
+  gradient: ['#808080', '#000000']
+
+columns:
+  - group: VoxelNeXt
+    columns:
+      - {label: mAP, metric: voxelnext/mAP, std: 'voxelnext/mAP:std', format: .3f, best: max}
+      - {label: mATE, metric: voxelnext/mATE, std: 'voxelnext/mATE:std', format: .3f, best: min}
+      - {label: mASE, metric: voxelnext/mASE, std: 'voxelnext/mASE:std', format: .3f, best: min}
+      - {label: mAOE, metric: voxelnext/mAOE, std: 'voxelnext/mAOE:std', format: .3f, best: min}
+      - {label: mAVE, metric: voxelnext/mAVE, std: 'voxelnext/mAVE:std', format: .2f, best: min}
+      - {label: mAAE, metric: voxelnext/mAAE, std: 'voxelnext/mAAE:std', format: .3f, best: min}
+      - {label: NDS, metric: voxelnext/NDS, std: 'voxelnext/NDS:std', format: .3f, best: max}
+  # not reported in RadarGen
+  - group: AP per class
+    columns:
+      - {label: Car, metric: voxelnext/car_AP, std: 'voxelnext/car_AP:std', format: .3f, best: max}
+      - {label: Truck, metric: voxelnext/truck_AP, std: 'voxelnext/truck_AP:std', format: .3f, best: max}
+      - {label: Trailer, metric: voxelnext/trailer_AP, std: 'voxelnext/trailer_AP:std', format: .3f, best: max}
+
+rows:
+  - group: published
+    rows:
+      - label: 'GT Radar \cite{borreda2026radargen}'
+        rank: false
+        values: {voxelnext/mAP: 0.38*, voxelnext/mATE: 0.54*, voxelnext/mASE: 0.18*, voxelnext/mAOE: 0.11*,
+                 voxelnext/mAVE: 1.88*, voxelnext/mAAE: 0.24*, voxelnext/NDS: 0.48*}
+      - label: 'Baseline (RGB2Point) \cite{borreda2026radargen}'
+        rank: false
+        values: {voxelnext/mAP: 0.00*, voxelnext/mATE: 1.00*, voxelnext/mASE: 1.00*, voxelnext/mAOE: 1.00*,
+                 voxelnext/mAVE: 1.00*, voxelnext/mAAE: 1.00*, voxelnext/NDS: 0.00*}
+      - label: 'RadarGen \cite{borreda2026radargen}'
+        rank: false
+        values: {voxelnext/mAP: 0.11*, voxelnext/mATE: 0.91*, voxelnext/mASE: 0.20*, voxelnext/mAOE: 0.21*,
+                 voxelnext/mAVE: 4.04*, voxelnext/mAAE: 0.19*, voxelnext/NDS: 0.30*}
+  - group: reference
+    rows:
+      - {label: 'GT Radar (reproduced)', run: real_radar, selection: val_keyframes_draws1, rank: false}
+  - group: RadarGen
+    rows:
+      - {label: 'RadarGen (reproduced)', run: radargen}
+      - {label: 'C3P-dar loss', run: dit/epoch_44_step_58057}
+  - group: C3P-dar
+    rows:
+      - {label: C3P-dar-Dv3, run: dino_neck_compact/epoch_94_step_20595}
+      - {label: C3P-dar-RN50, run: resnet50/epoch_95_step_25030}
+
+caption: |
+  VoxelNeXt detection on real and generated radar (car, truck, trailer; 50\,m range), as in \cite{borreda2026radargen} (Suppl.~Tab.~1).
+  Generated rows: mean $\pm$ s.d. over three draws. * means reported in \cite{borreda2026radargen}.

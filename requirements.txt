@@ -1,0 +1,20 @@
+
+--extra-index-url https://download.pytorch.org/whl/cu130
+
+torch==2.10.0+cu130
+torchvision==0.25.0+cu130
+
+h5py
+huggingface_hub
+lightning
+matplotlib
+pandas
+pyyaml
+safetensors
+scikit-learn
+scipy
+tensorboard
+timm==1.0.29
+tqdm
+
+# -e ./third_party/RadarGen --no-deps

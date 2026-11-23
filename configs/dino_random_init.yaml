@@ -1,0 +1,46 @@
+# Run 2863217 (ablation_dino_random_init, 16 GPUs); evaluated: outputs/dino_random_init/checkpoints/epoch_91_step_29915.ckpt
+data:
+  root: /e/scratch/nxtaim-1/public/truckscenes/RadarGen_preprocessed
+  num_workers: 8
+
+model:
+  type: dino
+  model_name: vit_small_patch16_dinov3
+  frozen_base: false
+  lora_r: 16
+  lora_alpha: 32.0
+  neck_layers: 12
+  neck_heads: 9
+  head:
+    channels: [128, 64, 32]
+    blocks: 2
+    heads: 4
+    window_size: 8
+    output_scale: 2
+    projection_kernel_size: 3
+    shifted_windows: true
+  grad_checkpointing: true
+
+loss:
+  normalize_by_gt_count: true
+  mark_link: cubic
+  weights: {ppp: 1.0, rcs: 1.0, doppler: 1.0}
+
+optim:
+  type: AdamW
+  lr: 1.0e-4
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.01
+
+train:
+  seed: 42
+  batch_size: 16  # per GPU
+  warmup_steps: 200
+  gradient_clip: 1.0
+  precision: bf16-mixed
+  max_steps: 29915
+  log_every_n_steps: 20
+  checkpoint_every_n_steps: 1000
+  val_every_n_steps: 2000
+  limit_val_batches: 50

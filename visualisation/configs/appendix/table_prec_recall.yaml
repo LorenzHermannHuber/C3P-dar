@@ -1,0 +1,50 @@
+# python visualisation/make_table.py visualisation/configs/appendix/table_prec_recall.yaml -o visualisation/plots/appendix/table_prec_recall.tex
+# Short table: precision, recall and F1 of the models' own point clouds (budget native of scripts/budgets.py).
+label: tab:precision_recall
+environment: table  # null: only the tabular, to \input in the tradeoff figure; table: single column; table*: both
+selection: val_keyframes_draws3
+units: none
+stds: true  # stds are scene-clustered standard errors of the mean
+style:
+  best: underline
+  gradient: ['#808080', '#000000']  # worst -> best ranked value of each column
+
+columns:
+  - group: Only Position
+    columns:
+      - {label: Prec., metric: 'budgets/mean?budget=native&score=position_precision',
+         std: 'budgets/se?budget=native&score=position_precision', format: .3f, best: max}
+      - {label: Recall, metric: 'budgets/mean?budget=native&score=position_recall',
+         std: 'budgets/se?budget=native&score=position_recall', format: .3f, best: max}
+      - {label: F1, metric: 'budgets/mean?budget=native&score=position_f1',
+         std: 'budgets/se?budget=native&score=position_f1', format: .3f, best: max}
+  - group: 'Position, RCS, Doppler'
+    columns:
+      - {label: 'Prec.${}^\dagger$', metric: 'budgets/mean?budget=native&score=distance_attr_precision',
+         std: 'budgets/se?budget=native&score=distance_attr_precision', format: .3f, best: max}
+      - {label: 'Recall${}^\dagger$', metric: 'budgets/mean?budget=native&score=distance_attr_recall',
+         std: 'budgets/se?budget=native&score=distance_attr_recall', format: .3f, best: max}
+      - {label: 'F1${}^\dagger$', metric: 'budgets/mean?budget=native&score=distance_attr_f1',
+         std: 'budgets/se?budget=native&score=distance_attr_f1', format: .3f, best: max}
+
+rows:
+  - group: RadarGen
+    rows:
+      - label: 'RadarGen \cite{borreda2026radargen}'
+        rank: false
+        values:  # published values
+          'budgets/mean?budget=native&score=distance_attr_precision': 0.26*
+          'budgets/mean?budget=native&score=distance_attr_recall': 0.23*
+          'budgets/mean?budget=native&score=distance_attr_f1': 0.24*
+      - {label: '\quad reproduced', run: radargen}
+      - {label: '\quad C3P-dar loss', run: dit/epoch_44_step_58057}
+  - group: C3P-dar
+    rows:
+      #- {label: C3P-dar-Dv3, run: dino/epoch_91_step_19914}
+      - {label: C3P-dar-Dv3, run: dino_neck_compact/epoch_94_step_20595}
+      - {label: C3P-dar-RN50, run: resnet50/epoch_95_step_25030}
+
+caption: |
+  DA precision, recall and F1 scores of the generated point clouds, matched one-to-one to the real radar points either only on position within 1\,m or jointly within {1\,m}, {8\,dBsm} RCS, and {2.5\,m/s} Doppler of a ground truth detection, as was proposed by \cite{borreda2026radargen}.
+#  Values are shaded from worst (light gray) to best (black and underlined).
+#  Values marked by * are as reported in \cite{borreda2026radargen}, and metrics marked by a ${}^\dagger$ were proposed by \cite{borreda2026radargen}.

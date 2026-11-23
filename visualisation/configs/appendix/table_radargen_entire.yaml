@@ -1,0 +1,62 @@
+# python visualisation/make_table.py visualisation/configs/appendix/table_radargen_entire.yaml -o visualisation/plots/appendix/table_radargen_entire.tex
+# RadarGen Table 1 (top, Entire Area) with our models. Stds are over frames x draws (population std, as RadarGen).
+label: tab:radargen_entire
+selection: val_keyframes_draws3
+units: none
+stds: true
+style:
+  best: underline
+  gradient: ['#808080', '#000000']
+
+columns:
+  - group: Entire Area
+    columns:
+      - {label: CD Loc., metric: summary/chamfer_distance_xy_mean, std: summary/chamfer_distance_xy_std, format: .2f, best: min}
+      - {label: CD Full, metric: summary/chamfer_distance_all_norm_mean, std: summary/chamfer_distance_all_norm_std, format: .3f, best: min}
+      - {label: 'IoU@1m', metric: summary/iou_th1_mean, std: summary/iou_th1_std, format: .2f, best: max}
+      - {label: DA Recall, metric: summary/distance_attr_recall_mean, std: summary/distance_attr_recall_std, format: .2f, best: max}
+      - {label: DA Prec., metric: summary/distance_attr_precision_mean, std: summary/distance_attr_precision_std, format: .2f, best: max}
+      - {label: DA F1, metric: summary/distance_attr_f1_mean, std: summary/distance_attr_f1_std, format: .2f, best: max}
+      - {label: MMD Loc., metric: summary/pcl_mmd_xy_mean, std: summary/pcl_mmd_xy_std, format: .3f, best: min}
+      - {label: MMD RCS, metric: summary/pcl_mmd_rcs_mean, std: summary/pcl_mmd_rcs_std, format: .2f, best: min}
+      - {label: MMD Doppler, metric: summary/pcl_mmd_doppler_mean, std: summary/pcl_mmd_doppler_std, format: .2f, best: min}
+
+rows:
+  - group: published
+    rows:
+      - label: 'Baseline (RGB2Point) \cite{borreda2026radargen}'
+        rank: false
+        values:
+          summary/chamfer_distance_xy_mean: '1.84 $\pm$ 0.48*'
+          summary/chamfer_distance_all_norm_mean: '0.038 $\pm$ 0.009*'
+          summary/iou_th1_mean: '0.23 $\pm$ 0.10*'
+          summary/distance_attr_recall_mean: '0.15 $\pm$ 0.10*'
+          summary/distance_attr_precision_mean: '0.14 $\pm$ 0.10*'
+          summary/distance_attr_f1_mean: '0.14 $\pm$ 0.09*'
+          summary/pcl_mmd_xy_mean: '0.368 $\pm$ 0.151*'
+          summary/pcl_mmd_rcs_mean: '0.36 $\pm$ 0.25*'
+          summary/pcl_mmd_doppler_mean: '0.65 $\pm$ 0.64*'
+      - label: 'RadarGen \cite{borreda2026radargen}'
+        rank: false
+        values:
+          summary/chamfer_distance_xy_mean: '1.68 $\pm$ 0.39*'
+          summary/chamfer_distance_all_norm_mean: '0.040 $\pm$ 0.008*'
+          summary/iou_th1_mean: '0.31 $\pm$ 0.11*'
+          summary/distance_attr_recall_mean: '0.23 $\pm$ 0.12*'
+          summary/distance_attr_precision_mean: '0.26 $\pm$ 0.12*'
+          summary/distance_attr_f1_mean: '0.24 $\pm$ 0.12*'
+          summary/pcl_mmd_xy_mean: '0.056 $\pm$ 0.062*'
+          summary/pcl_mmd_rcs_mean: '0.09 $\pm$ 0.15*'
+          summary/pcl_mmd_doppler_mean: '0.31 $\pm$ 0.74*'
+  - group: RadarGen
+    rows:
+      - {label: 'RadarGen (reproduced)', run: radargen}
+      - {label: 'C3P-dar loss', run: dit/epoch_44_step_58057}
+  - group: C3P-dar
+    rows:
+      - {label: C3P-dar-Dv3, run: dino_neck_compact/epoch_94_step_20595}
+      - {label: C3P-dar-RN50, run: resnet50/epoch_95_step_25030}
+
+caption: |
+  Entire-area metrics of \cite{borreda2026radargen} (Tab.~1, top) for all models: mean $\pm$ s.d. over all validation keyframes and draws.
+  * means reported in \cite{borreda2026radargen}.
