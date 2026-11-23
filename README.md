@@ -10,7 +10,7 @@ Conditional Poisson Point Processes for Image-to-Radar Generation**.
 
 This code was developed jointly by
 **Lorenz Hermann Huber** ([lorenz.h.huber@campus.tu-berlin.de](mailto:lorenz.h.huber@campus.tu-berlin.de))
-and **Jonas Neuhöfer** ([jonas.neuhoefer@aumovio.com](mailto:jonas.neuhoefer@aumovio.com)).
+and **[Jonas Neuhöfer](https://github.com/JonasNeuhoefer)** ([jonas.neuhoefer@aumovio.com](mailto:jonas.neuhoefer@aumovio.com)).
 
 ## Setup
 
